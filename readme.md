@@ -1,26 +1,19 @@
-Healthcare Claims Leakage Analytics
+# Healthcare Claims Leakage Analytics
 Cost Decomposition, Provider Benchmarking & Empirical Bayes Risk Adjustment
-Overview
+## Overview
+This project implements a full healthcare analytics pipeline to identify outpatient cost leakage using SQL‑based benchmarking, statistical decomposition, and Empirical Bayes shrinkage.
+Using 1.2M synthetic claims stored in PostgreSQL, the workflow:
+- Quantifies rolling cost trends
+- Decomposes year‑over‑year spend into volume, case‑mix, and price effects
+- Benchmarks providers against peer groups
+- Applies Empirical Bayes shrinkage to stabilize noisy residuals
+- Produces an audit‑ready shortlist of potential outlier providers
 
-This project builds a healthcare analytics pipeline to identify outpatient cost leakage using SQL-based benchmarking and Empirical Bayes shrinkage.
-
-Using 1.2M synthetic claims stored in PostgreSQL, the analysis:
-
-Quantifies rolling cost trends
-
-Decomposes YoY spend into volume, case-mix, and price effects
-
-Benchmarks providers against peer groups
-
-Applies statistical shrinkage to reduce noise
-
-Generates an audit-ready provider shortlist
-
-# Key Results
+## Key Results
 
 ---
 
-## 1. Rolling 12-Month Allowed per Claim
+### 1. Rolling 12-Month Allowed per Claim
 
 ![Rolling 12M Allowed per Claim](reports/figures/01_rolling_12m_allowed_per_claim.png)
 
@@ -28,7 +21,7 @@ Allowed per claim shows sustained inflation while claim volume remains relativel
 
 ---
 
-## 2. Year-over-Year Cost Decomposition
+### 2. Year-over-Year Cost Decomposition
 
 ![Cost Decomposition](reports/figures/02_cost_decomposition.png)
 
@@ -43,7 +36,7 @@ Conclusion: Cost growth is overwhelmingly price-driven.
 
 ---
 
-## 3. CPT Group Contribution (Price vs Case Mix)
+### 3. CPT Group Contribution (Price vs Case Mix)
 
 ![CPT Group Contributions](reports/figures/04_cpt_group_price_vs_mix.png)
 
@@ -56,7 +49,7 @@ Largest price-driven categories:
 
 ---
 
-## 4. Top Providers by Estimated Excess Allowed (Empirical Bayes Adjusted)
+### 4. Top Providers by Estimated Excess Allowed (Empirical Bayes Adjusted)
 
 ![Top Providers Excess Allowed](reports/figures/03_top10_provider_excess_allowed.png)
 
@@ -68,38 +61,29 @@ Top providers demonstrate:
 
 ---
 
-## 5. Raw vs Empirical Bayes Residual Distribution
+### 5. Raw vs Empirical Bayes Residual Distribution
 
 ![Residual Distribution Raw vs EB](reports/figures/05_residual_distribution_raw_vs_eb.png)
 
 Shrinkage reduces heavy tails and stabilizes outlier detection.
-Methodology
+## Methodology
+Provider Grouping
+Providers are benchmarked within peer groups defined by:
+- Specialty
+- Place of Service
+- County
+Residual Calculation
+\mathrm{Residual}=\mathrm{provider\_ allowed\_ per\_ claim}-\mathrm{peer\_ allowed\_ per\_ claim}
+Empirical Bayes Adjustment
+\mathrm{EB\  Residual}=w\times \mathrm{Residual}
+Where w is the credibility weight based on provider volume and peer variance.
+Flagging Criteria
+A provider is flagged if:
+- ≥ 2 high EB percentile months
+- ≥ 150 claims in 6 months
+- ≥ 4 months observed
 
-Providers grouped by:
-
-Specialty
-
-Place of Service
-
-County
-
-Residual:
-
-provider_allowed_per_claim − peer_allowed_per_claim
-
-Empirical Bayes adjustment:
-
-EB_residual = w × residual
-
-Flag criteria:
-
-≥ 2 high EB percentile months
-
-≥ 150 claims in 6 months
-
-≥ 4 months observed
-
-Project Structure
+```text
 claims-leakage/
 ├── sql/
 ├── src/
@@ -107,9 +91,9 @@ claims-leakage/
 │   └── figures/
 ├── data/
 └── README.md
-Author
 
+
+
+Author
 Tarak Ram Donepudi
 MS Computer Science
-
-Now Verify
